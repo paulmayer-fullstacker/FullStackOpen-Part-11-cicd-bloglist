@@ -1,13 +1,18 @@
 // app.js:
-const express = require('express')       // Imports Express framework.
-const mongoose = require('mongoose')      // Import Mongoose
+const express = require('express') // Imports Express framework.
+const mongoose = require('mongoose') // Import Mongoose
 const blogsRouter = require('./controllers/blogs') // Import the router module from blogs.js
 const usersRouter = require('./controllers/users')
 const loginRouter = require('./controllers/login')
-const middleware = require('./utils/middleware')  // Imports the error handlers, exported from middleware.js.
+const middleware = require('./utils/middleware') // Imports the error handlers, exported from middleware.js.
 const config = require('./utils/config') // Import config to get MONGODB_URI
 
-const app = express()  // Initialization: Create the core Express application object.
+const app = express() // Initialization: Create the core Express application object.
+
+// Added for CI/CD & Production deployments.
+// Serves static files from the 'dist' directory (compiled React frontend).
+// Express checks 'dist' first for matching frontend files (index.html, JS, CSS) before passing requests down to API routes.
+app.use(express.static('dist'))
 
 mongoose
   .connect(config.MONGODB_URI)
@@ -47,7 +52,6 @@ app.use(middleware.unknownEndpoint)
 
 // Handler for errors (e.g., CastError, ValidationError)
 app.use(middleware.errorHandler)
-
 
 // Export the configured Express application instance. Then index.js can start the server using it.
 module.exports = app

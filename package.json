@@ -1,0 +1,16 @@
+{
+  "name": "fullstack-open-cicd-bloglist",
+  "version": "1.0.0",
+  "private": true,
+  "scripts": {
+    "install:all": "npm install --prefix bloglist-backend-part4 && npm install --prefix bloglist-frontend-main && npm install --prefix bloglist-e2e-tests",
+    "install:playwright": "cd bloglist-e2e-tests && npx playwright install --with-deps",
+    "build:ui": "cd bloglist-frontend-main && npm run build",
+    "copy:ui": "node -e \"require('fs').rmSync('./bloglist-backend-part4/dist', { recursive: true, force: true }); require('fs').cpSync('./bloglist-frontend-main/dist', './bloglist-backend-part4/dist', { recursive: true });\"",
+    "build": "npm run build:ui && npm run copy:ui",
+    "lint": "npm run lint --prefix bloglist-backend-part4 && npm run lint --prefix bloglist-frontend-main",
+    "test:backend": "npm run test --prefix bloglist-backend-part4",
+    "test:frontend": "npm run test --prefix bloglist-frontend-main",
+    "test:e2e": "cd bloglist-e2e-tests && npx playwright test"
+  }
+}
