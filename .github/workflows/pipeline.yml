@@ -1,0 +1,62 @@
+# FullStackOpen-Part-11-cicd-bloglist/.github/workflows/pipeline.yml:
+name: Deployment Pipeline
+# When will this workflow be triggered?
+on:
+  # Trigger workflow on pushes directly to main branch.
+  push:
+    branches:
+      - main
+  # Trigger workflow on pull requests targeting the main branch.
+  pull_request:
+    branches: [main]
+    types: [opened, synchronize]  # Runs when a PR is opened or updated with new commits.
+# Jobs: executed in parallel on GitHub-hosted virtual runners.
+jobs:
+# Single job for building, linting, and running unit + E2E tests across all sub-projects.
+  simple_deployment_pipeline:
+    # Specify runner environment (VM with Ubuntu OS).
+    runs-on: ubuntu-latest
+    # Job-level env vars. Available to all steps within this job.
+    env:
+      TEST_MONGODB_URI: ${{ secrets.TEST_MONGODB_URI }}
+      SECRET: ${{ secrets.SECRET }}
+      PORT: 3003
+    # Sequential array of steps executed inside the runner container.
+    steps:
+      # Step-1: Check out the repository code into the runner environment.
+      - uses: actions/checkout@v6
+      # Step-2: Set up Node.js runtime environment (v24).
+      - uses: actions/setup-node@v6
+        with:
+          node-version: "24"
+      # Step-3: Run root orchestrator script to install dependencies across all subfolders:
+        # (bloglist-backend-part4, bloglist-frontend-main, and bloglist-e2e-tests).
+      - name: Install dependencies
+        run: npm run install:all
+      # Step-4: Execute ESLint against both backend and frontend codebases.
+      - name: Check styling (Lint)
+        run: npm run lint
+      # Step-5: Compile React frontend (Vite) into 'dist' folder and copy output into backend static folder.
+      - name: Build UI
+        run: npm run build
+      # Step-6: Execute Jest unit/integration tests for the Express backend. Secrets inherited from job env.
+      - name: Run Backend Tests
+        run: npm run test:backend
+      # Step-7: Execute Vitest/Jest unit & component tests for the React frontend.
+      - name: Run Frontend Tests
+        run: npm run test:frontend
+      # Step-8: Download Playwright browser binaries (Chromium), used by bloglist-e2e-tests.
+      - name: Install Playwright Browsers
+        run: npm run install:playwright
+      # Step-9: Execute End-to-End integration suite.   Port & secrets inherited from job env.
+      - name: Run E2E Tests
+        # 1. Navigate into backend directory.
+        # 2. Launches backend server in test mode in background ('&') on port 3003.
+        # 3. Uses 'npx wait-on' to pause execution until HTTP server responds on port 3003.
+        # 4. Navigates back to root and launches Playwright test runner against active backend.
+        run: |
+          cd bloglist-backend-part4
+          npm run start:test &
+          npx wait-on http://localhost:$PORT
+          cd ..
+          npm run test:e2e
