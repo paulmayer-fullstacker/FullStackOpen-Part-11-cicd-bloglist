@@ -21,20 +21,18 @@ test('Blog component renders title and author, but not URL or likes in default v
   // Use the shared testBlog object
   const blog = testBlog
 
-  render(<Blog blog={blog} />)  // Renders the 'Blog' component, passing the mock 'blog' object as a prop.
-  // This mounts the component into the JSDOM environment, simulating a browser. See vite.config.js:test:environment:'jsdom'.
+  // Destructure `container` from `render(<Blog blog={blog} />)`.
+  const { container } = render(<Blog blog={blog} />)
 
-  // Create title and author string.
-  // String Interpolation ($\{...\}$): Expressions {inside the curly braces} evaluated and converted into their string representation.
-  // Template Literal (`...`): Embeds expressions (`variables, object properties, function calls`) directly inside a string.
-  // Concatenation (=): The resulting string values are then combined with the space character between them. Result: singal string value.
-  const titleAndAuthorText = `${blog.title} ${blog.user.name}`
+  // Target the container element holding the default view. Query `.default-view` (or `.blog-title-author`) directly.
+  const defaultViewElement = container.querySelector('.default-view') || container.querySelector('.blog-title-author')
 
-  // Use screen.getByText to check if the main text content (titleAndAuthorText) is present.
-  // `getByText` throws an error if element not found. exact: false, matching is case-insensitive.
-  const defaultViewElement = screen.getByText(titleAndAuthorText, { exact: false }) // exact: false, also handles potential white-space/ordering issues.
-  expect(defaultViewElement).toBeDefined()  // Expect element to be successfully found (i.e., it is defined).
-  expect(defaultViewElement).toBeVisible()  // Expect element containing title/author is visible to the user.
+  // Assert that both title and author name are present inside the rendered element
+  expect(defaultViewElement).toBeDefined()
+  expect(defaultViewElement).toBeVisible()
+  // `.toHaveTextContent()` checks if a string exists anywhere inside the DOM element, ignoring the 'by' separator, HTML tags, or line breaks.
+  expect(defaultViewElement).toHaveTextContent(blog.title)
+  expect(defaultViewElement).toHaveTextContent(blog.user.name)
   // Use queryByText to check that URL is NOT visible by default.
   const urlElement = screen.queryByText(blog.url) //  if blog.url exists, urlElement=reference to URL, else urlElement=null
   expect(urlElement).toBeNull() // Expect urlElement to equal null.

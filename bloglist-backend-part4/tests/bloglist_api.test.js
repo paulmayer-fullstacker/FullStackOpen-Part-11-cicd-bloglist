@@ -104,7 +104,7 @@ describe ('API Test Suite', () => {  // Starts the main test suite for the blogs
       assert.strictEqual(newlyCreatedBlog.title, newBlog.title, 'The title should match the sent blog')
       assert.strictEqual(newlyCreatedBlog.url, newBlog.url, 'The URL should match the sent blog')
       assert.strictEqual(newlyCreatedBlog.likes, newBlog.likes, 'The likes should match the sent blog')
-      // AMENDED: Access 'id' property on newlyCreatedBlog.user because the backend populates user as an object ({ id, username, name })
+      // Access 'id' property on newlyCreatedBlog.user because the backend populates user as an object ({ id, username, name })
       assert.strictEqual(newlyCreatedBlog.user.id, initialUser.id.toString(), 'The user ID should be returned in the saved blog object')
       // assert.strictEqual(newlyCreatedBlog.user, initialUser.id, 'The user ID should be returned in the saved blog')
       // // Extract all titles from the newly fetched blogs  // No Longer Used. Test criteria not rigorous enough.
@@ -132,7 +132,7 @@ describe ('API Test Suite', () => {  // Starts the main test suite for the blogs
       assert.strictEqual(newlyCreatedBlog.likes, 0, 'The likes property should default to 0 when missing from the request')
       // Verify the other properties are still correct for completeness
       assert.strictEqual(newlyCreatedBlog.title, newBlog.title, 'Title should be saved correctly')
-      // AMENDED: Access 'id' property on newlyCreatedBlog.user because the backend populates user as an object ({ id, username, name })
+      // Access 'id' property on newlyCreatedBlog.user because the backend populates user as an object ({ id, username, name })
       assert.strictEqual(newlyCreatedBlog.user.id, initialUser.id.toString(), 'The user ID should be returned in the saved blog object')
       // assert.strictEqual(newlyCreatedBlog.user, initialUser.id, 'The user ID should be returned in the saved blog') // Confirm user association (author now removed)
     })
