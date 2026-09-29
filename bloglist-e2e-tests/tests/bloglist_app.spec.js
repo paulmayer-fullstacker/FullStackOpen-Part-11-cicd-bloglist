@@ -20,7 +20,9 @@ describe('Blog app', () => {
     await request.post('/api/testing/reset')  // API call clears the Db before each test run. Ensures test atomicity.
     // Create primary user (Creator) in the database using the createUser() helper function.
     await createUser(request, TEST_USER)
-    await page.goto('http://localhost:5173')  // Navigate the browser to the application's base URL. Here, Playwright is controling real browser engin(s).
+    // Use relative path '/' to hit baseURL (http://localhost:3003)
+    await page.goto('/')
+    //  await page.goto('http://localhost:5173')  // Navigate the browser to the application's base URL. Here, Playwright is controling real browser engin(s).
   })
 
   test('Login form is shown', async ({ page }) => {
