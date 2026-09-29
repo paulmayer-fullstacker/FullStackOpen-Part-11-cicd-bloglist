@@ -40,7 +40,7 @@ export default defineConfig({
   webServer: {
     command: 'npm run start:test --prefix ../bloglist-backend-part4',
     url: 'http://127.0.0.1:3003',
-    reuseExistingServer: !process.env.CI,
+    reuseExistingServer: true, // Allow Playwright to connect to an already running server  // Removed !process.env.CI,
     timeout: 120 * 1000,
   },
 
