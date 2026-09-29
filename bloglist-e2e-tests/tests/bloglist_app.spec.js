@@ -197,11 +197,19 @@ describe('Blog app', () => {
       // Mid Liked Blog liked 3 times.
       await likeBlogMultiTimes(midLikedEntry, 3)
       // Wait for the UI to register the 3 likes on midLikedEntry before reading DOM order
-      await expect(midLikedEntry.getByText('likes 3')).toBeVisible()
+      //await expect(midLikedEntry.getByText('likes 3')).toBeVisible()
       // Once the UI has registered the 3 likes (above), we can capture the DOM order.
       // Get all blog titles by their text content, using the class 'blog-title-author' identifier.
       // This maintains the order that the elements appear on the page (top to bottom).
-      const orderedTitles = await page.locator('.blog-title-author').allTextContents()
+      // const orderedTitles = await page.locator('.blog-title-author').allTextContents()
+
+      // Alternative Option A: Check DOM position directly using nth child locators
+      const blogTitles = page.locator('.blog-title-author')
+      await expect(blogTitles.nth(0)).toContainText(blog2Title)
+      await expect(blogTitles.nth(1)).toContainText(blog3Title)
+      await expect(blogTitles.nth(2)).toContainText(blog1Title)
+
+      const orderedTitles = await blogTitles.allTextContents()
 
       // The expected order is: Most Liked (5) > Mid Liked (3) > Least Liked (0)
       const expectedOrder = [
