@@ -30,10 +30,18 @@ export default defineConfig({
   /* Shared settings for all the projects below. See https://playwright.dev/docs/api/class-testoptions. */
   use: {
     /* Base URL to use in actions like `await page.goto('/')`. Set base URL to match backend server port (3003) */
-    baseURL: process.env.TEST_BASE_URL || 'http://localhost:3003',
+    baseURL: process.env.TEST_BASE_URL || 'http://127.0.0.1:3003',
 
     /* Collect trace when retrying the failed test. See https://playwright.dev/docs/trace-viewer */
     trace: 'on-first-retry',
+  },
+
+  // Auto-start frontend/backend locally if not already running
+  webServer: {
+    command: 'npm run start:test --prefix ../bloglist-backend-part4',
+    url: 'http://127.0.0.1:3003',
+    reuseExistingServer: !process.env.CI,
+    timeout: 120 * 1000,
   },
 
   /* Configure projects for major browsers */

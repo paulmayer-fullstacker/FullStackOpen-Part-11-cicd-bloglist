@@ -196,6 +196,9 @@ describe('Blog app', () => {
       await likeBlogMultiTimes(mostLikedEntry, 5)
       // Mid Liked Blog liked 3 times.
       await likeBlogMultiTimes(midLikedEntry, 3)
+      // Wait for the UI to register the 3 likes on midLikedEntry before reading DOM order
+      await expect(midLikedEntry.getByText('likes 3')).toBeVisible()
+      // Once the UI has registered the 3 likes (above), we can capture the DOM order.
       // Get all blog titles by their text content, using the class 'blog-title-author' identifier.
       // This maintains the order that the elements appear on the page (top to bottom).
       const orderedTitles = await page.locator('.blog-title-author').allTextContents()
