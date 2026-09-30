@@ -20,9 +20,8 @@ describe('Blog app', () => {
     await request.post('/api/testing/reset')  // API call clears the Db before each test run. Ensures test atomicity.
     // Create primary user (Creator) in the database using the createUser() helper function.
     await createUser(request, TEST_USER)
-    // Use relative path '/' to hit baseURL (http://localhost:3003)
+    // Use relative path '/' which resolves to baseURL configured in playwright.config.js (http://localhost:3003)
     await page.goto('/')
-    //  await page.goto('http://localhost:5173')  // Navigate the browser to the application's base URL. Here, Playwright is controling real browser engin(s).
   })
 
   test('Login form is shown', async ({ page }) => {
@@ -74,8 +73,7 @@ describe('Blog app', () => {
       const authorName = TEST_USER.name 
      
       await createBlog(page, blogTitle, blogUrl, authorName)  // Use createBlog() helper function to create and submit a new blog.
-  
-      // Confirm new blob title is in list of blogs. Use .blog-title-author class locator for specificity
+      // Confirm new blog title is present in list of blogs. Use .blog-title-author class locator for DOM specificity.
       const newBlogLocator = page.locator(`.blog-title-author:has-text("${blogTitle}")`)
       await expect(newBlogLocator).toBeVisible()  // Verifies the new blog appears in the list
       
@@ -96,7 +94,7 @@ describe('Blog app', () => {
       const blogEntry = page.locator('.blog-item', { 
           hasText: blogTitle 
       })
-      // Refering to the identified blog item container, click the 'view' button to reveal details and the like button
+      // Referring to the identified blog item container, click the 'view' button to reveal details and the like button.
       await blogEntry.getByRole('button', { name: 'view' }).click()
       // Confirm initial state: 'likes: 0'
       await expect(blogEntry.getByText('likes 0')).toBeVisible()
@@ -117,15 +115,13 @@ describe('Blog app', () => {
            
       // Create a blog to be deleted
       await createBlog(page, blogTitle, blogUrl, authorName)
-      // Define the full text expected to be in the blog list
-      const blogText = `${blogTitle} by ${authorName}`
       // Identify blog item container by class (.blog-item) filtered by blogTitle
       const blogEntry = page.locator('.blog-item', { 
           hasText: blogTitle 
       })
       // Click the 'view' button to reveal details and the remove button
       await blogEntry.getByRole('button', { name: 'view' }).click()
-      // Set up a dialog listener BEFORE clicking 'remove'. Playwright should accept (click OK) on the confirmation dialog.
+      // Set up a dialog listener before clicking 'remove'. Playwright should accept (click OK) on the confirmation dialog.
       /* NOTE:
       page.once(...)	Register an event listener active for only one occurrence of the specified event. After the event fires once, the listener is automatically removed.
       'dialog': The event being listened for. The 'dialog' event fires whenever the browser attempts to show a native modal dialog box [alert(), prompt(), confirm()] box.
@@ -196,20 +192,20 @@ describe('Blog app', () => {
       await likeBlogMultiTimes(mostLikedEntry, 5)
       // Mid Liked Blog liked 3 times.
       await likeBlogMultiTimes(midLikedEntry, 3)
-      // Wait until both blog components render their updated like count
+      // Synchronize test execution by waiting until both blog components render their target like counts in the UI.
+      // for the UI to register the 5 likes on mostLikedEntry.
       await expect(mostLikedEntry.getByText('likes 5')).toBeVisible()
       // Wait for the UI to register the 3 likes on midLikedEntry before reading DOM order
       await expect(midLikedEntry.getByText('likes 3')).toBeVisible()
       // Once the UI has registered the 3 likes (above), we can capture the DOM order.
-
-      // Capture all blog titles in rendered DOM order (top to bottom)
+      // Capture all blog title elements in rendered DOM order (top to bottom).
       const blogTitles = page.locator('.blog-title-author')
-      // Confirm individual positions using zero-based nth locators
+      // Confirm DOM positional order using Playwright auto-retrying zero-based nth locators.
       await expect(blogTitles.nth(0)).toContainText(blog2Title)
       await expect(blogTitles.nth(1)).toContainText(blog3Title)
       await expect(blogTitles.nth(2)).toContainText(blog1Title)
 
-      // The expected order is: Most Liked (5) > Mid Liked (3) > Least Liked (0)
+      // Define expected array order:: Most Liked (5) > Mid Liked (3) > Least Liked (0)
       const expectedOrder = [
         `${blog2Title} by ${authorName}`,
         `${blog3Title} by ${authorName}`,
