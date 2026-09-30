@@ -33,9 +33,11 @@ const createUser = async (request, user) => {
 const likeBlogMultiTimes = async (blogEntry, n) => {
   // blogEntry is a Playwright Locator object passed from the test file.
   const likeButton = blogEntry.getByRole('button', { name: 'like' })
-  for (let i = 0; i < n; i++) {
+  for (let i = 1; i <= n; i++) {
     // Playwright automatically waits for the element to be ready before clicking.
     await likeButton.click()
+    // Wait for the UI to register this click before triggering the next one
+    await blogEntry.getByText(`likes ${i}`).waitFor()
   }
 }
 

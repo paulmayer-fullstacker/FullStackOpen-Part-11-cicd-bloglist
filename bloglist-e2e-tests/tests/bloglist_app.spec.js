@@ -177,13 +177,13 @@ describe('Blog app', () => {
       const blog2Title = 'Most Liked Blog'   //           5 likes
       const blog3Title = 'Mid Liked Blog'    //           3 likes
       const authorName = TEST_USER.name
-      // Create all three blogs
+      // Create all three blogs in the database
       await createBlog(page, blog1Title, 'http://blog1.com', authorName)
       await createBlog(page, blog2Title, 'http://blog2.com', authorName)
       await createBlog(page, blog3Title, 'http://blog3.com', authorName)
       // Locate all blog entry containers and click 'view' on all of them to reveal the 'like' buttons.
       const blogEntries = await page.locator('.blog-item').all()
-      // Itterate through the blog entry containers. Expand all blogs entry containers, in order to access the [like] buttons)
+      // Iterate through the blog entry containers. Expand all blogs entry containers, in order to access the [like] buttons)
       for (const entry of blogEntries) {
         // Find the 'view' button within the current entry and click it
         await entry.getByRole('button', { name: 'view' }).click()
@@ -201,17 +201,13 @@ describe('Blog app', () => {
       // Wait for the UI to register the 3 likes on midLikedEntry before reading DOM order
       await expect(midLikedEntry.getByText('likes 3')).toBeVisible()
       // Once the UI has registered the 3 likes (above), we can capture the DOM order.
-      // Get all blog titles by their text content, using the class 'blog-title-author' identifier.
-      // This maintains the order that the elements appear on the page (top to bottom).
-      // const orderedTitles = await page.locator('.blog-title-author').allTextContents()
 
-      // Alternative Option A: Check DOM position directly using nth child locators
+      // Capture all blog titles in rendered DOM order (top to bottom)
       const blogTitles = page.locator('.blog-title-author')
+      // Confirm individual positions using zero-based nth locators
       await expect(blogTitles.nth(0)).toContainText(blog2Title)
       await expect(blogTitles.nth(1)).toContainText(blog3Title)
       await expect(blogTitles.nth(2)).toContainText(blog1Title)
-
-      const orderedTitles = await blogTitles.allTextContents()
 
       // The expected order is: Most Liked (5) > Mid Liked (3) > Least Liked (0)
       const expectedOrder = [
@@ -220,6 +216,7 @@ describe('Blog app', () => {
         `${blog1Title} by ${authorName}`
       ]
       // Confirm that the rendered order of titles is same as expected order.
+      const orderedTitles = await blogTitles.allTextContents()
       await expect(orderedTitles).toEqual(expectedOrder)
     })
   })
