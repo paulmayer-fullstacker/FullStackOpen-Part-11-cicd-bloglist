@@ -120,6 +120,10 @@ Explicit Order Verification: Asserted both exact array matches (`allTextContents
 
 Switched to new development platform. So, made test commits to confirm baseline.
 
+<!-- Pipeline test on push to main -->
+
+<!-- Pipeline test on feature branch merge to main -->
+
 ---
 
 <br/>
