@@ -124,6 +124,8 @@ Switched to new development platform. So, made test commits to confirm baseline.
 
 <!-- Pipeline test on feature branch merge to main -->
 
+Exercise-22: Require approval for feature branch merge to main.
+
 ---
 
 <br/>
